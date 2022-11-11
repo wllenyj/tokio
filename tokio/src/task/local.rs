@@ -286,6 +286,12 @@ struct LocalData {
     ctx: RcCell<Context>,
 }
 
+impl Drop for LocalData {
+    fn drop(&mut self) {
+        println!("tokio LocalData drop");
+    }
+}
+
 cfg_rt! {
     /// Spawns a `!Send` future on the current [`LocalSet`].
     ///
@@ -830,6 +836,8 @@ impl Default for LocalSet {
 
 impl Drop for LocalSet {
     fn drop(&mut self) {
+        println!("tikio LocalSet drop");
+
         self.with_if_possible(|| {
             // Shut down all tasks in the LocalOwnedTasks and close it to
             // prevent new tasks from ever being added.
