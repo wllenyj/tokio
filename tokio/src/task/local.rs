@@ -276,14 +276,21 @@ pin_project! {
     }
 }
 
-tokio_thread_local!(static CURRENT: LocalData = const { LocalData {
-    thread_id: Cell::new(None),
-    ctx: RcCell::new(),
-} });
+tokio_thread_local!(static CURRENT: LocalData = LocalData::new());
 
 struct LocalData {
     thread_id: Cell<Option<ThreadId>>,
     ctx: RcCell<Context>,
+}
+
+impl LocalData {
+    fn new() -> Self {
+        println!("tokio LocalData new");
+        Self {
+            thread_id: Cell::new(None),
+            ctx: RcCell::new(),
+        }
+    }
 }
 
 impl Drop for LocalData {
@@ -385,6 +392,7 @@ impl fmt::Debug for LocalEnterGuard {
 impl LocalSet {
     /// Returns a new local task set.
     pub fn new() -> LocalSet {
+        println!("tokio LocalSet new -->");
         LocalSet {
             tick: Cell::new(0),
             context: Rc::new(Context {
